@@ -7,11 +7,68 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      # Create a user: username/password
       ACCOUNT_media: secretpassword
       UID_media: 1000
       GID_media: 1000
-      # Share definition: name|path|browseable|readonly|guest ok|valid users
       SAMBA_VOLUME_CONFIG_media: "[Media];path=/shares/media;browseable=yes;read only=no;guest ok=no;valid users=media;force user=media"
     volumes:
       - ./media:/shares/media
+
+  nextcloud-db:
+    image: mariadb:11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: nextcloudpassword
+    volumes:
+      - ./ignored/nextcloud-db:/var/lib/mysql
+    networks:
+      - nextcloud-net
+
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      MYSQL_HOST: nextcloud-db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: nextcloudpassword
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: adminpassword
+    volumes:
+      - ./ignored/nextcloud-data:/var/www/html
+      - ./media:/media
+    networks:
+      - nextcloud-net
+    depends_on:
+      - nextcloud-db
+
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: Europe/Madrid
+      WEBPASSWORD: password
+      PIHOLE_DNS_1: 8.8.8.8
+      PIHOLE_DNS_2: 8.8.4.4
+      DNSMASQ_LISTENING: all
+      DHCP_ACTIVE: "true"
+      DHCP_START: 192.168.1.10
+      DHCP_END: 192.168.1.150
+      DHCP_ROUTER: 192.168.1.1
+    volumes:
+      - ./ignored/pihole/etc-pihole:/etc/pihole
+      - ./ignored/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    cap_add:
+      - NET_ADMIN
+
+networks:
+  nextcloud-net:
