@@ -1,0 +1,17 @@
+services:
+  samba:
+    image: ghcr.io/servercontainers/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    environment:
+      # Create a user: username/password
+      ACCOUNT_media: secretpassword
+      UID_media: 1000
+      GID_media: 1000
+      # Share definition: name|path|browseable|readonly|guest ok|valid users
+      SAMBA_VOLUME_CONFIG_media: "[Media];path=/shares/media;browseable=yes;read only=no;guest ok=no;valid users=media;force user=media"
+    volumes:
+      - ./media:/shares/media
