@@ -70,5 +70,111 @@ services:
     cap_add:
       - NET_ADMIN
 
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich-server
+    restart: unless-stopped
+    ports:
+      - "2283:2283"
+    environment:
+      DB_HOSTNAME: immich-db
+      DB_USERNAME: immich
+      DB_PASSWORD: immichpassword
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: immich-redis
+    volumes:
+      - ./ignored/immich-data:/usr/src/app/upload
+      - ./ignored/immich-library:/usr/src/app/external
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - immich-net
+    depends_on:
+      - immich-db
+      - immich-redis
+      - immich-machine-learning
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich-machine-learning
+    restart: unless-stopped
+    volumes:
+      - ./ignored/immich-model-cache:/cache
+    networks:
+      - immich-net
+
+  immich-redis:
+    image: redis:6.2-alpine
+    container_name: immich-redis
+    restart: unless-stopped
+    networks:
+      - immich-net
+
+  immich-db:
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0
+    container_name: immich-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: immich
+      POSTGRES_PASSWORD: immichpassword
+      POSTGRES_DB: immich
+    volumes:
+      - ./ignored/immich-db:/var/lib/postgresql/data
+    networks:
+      - immich-net
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.1.24:3000
+    volumes:
+      - ./config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    environment:
+      TZ: Europe/Madrid
+    volumes:
+      - ./ignored/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./ignored/uptime-kuma:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  wg-easy:
+    image: ghcr.io/wg-easy/wg-easy:latest
+    container_name: wg-easy
+    restart: unless-stopped
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    environment:
+      WG_HOST: samuelcasanova.duckdns.org
+      PASSWORD_HASH: $$2a$$12$$lrCgd... #wgpassword
+      WG_DEFAULT_DNS: 192.168.1.24,1.1.1.1
+    volumes:
+      - ./ignored/wg-easy:/etc/wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+
 networks:
   nextcloud-net:
+  immich-net:

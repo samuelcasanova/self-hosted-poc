@@ -1,0 +1,73 @@
+---
+- Media:
+    - Immich:
+        icon: immich.png
+        href: http://192.168.1.24:2283
+        description: Photo library
+        server: my-server
+        container: immich-server
+        widget:
+          type: immich
+          url: http://192.168.1.24:2283
+          key: vbpZE0mXkinDi566zJLcJ3qzf4ziFJlE49gnYGlNIo
+          version: 2
+    - Nextcloud:
+        icon: nextcloud.png
+        href: http://192.168.1.24:8080
+        description: File sync
+        server: my-server
+        container: nextcloud
+
+- Home:
+    - Home Assistant:
+        icon: home-assistant.png
+        href: http://192.168.1.24:8123
+        description: Home automation
+        server: my-server
+        container: homeassistant
+        widget:
+          type: homeassistant
+          url: http://192.168.1.24:8123
+          key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZTk4YWE0NTBhZTk0ZTk1OWQwZDg1ZTE4NjBiNzU0MyIsImlhdCI6MTc4MDc2NDkxMSwiZXhwIjoyMDk2MTI0OTExfQ.jI4ELCfnszMs1sQ_56dCcehpUcJ925VUEeuBFSdsizo
+
+- Network:
+    - WireGuard:
+        icon: wireguard.png
+        href: http://192.168.1.24:51821
+        description: VPN
+        server: my-server
+        container: wg-easy
+        widget:
+          type: wgeasy
+          url: http://192.168.1.24:51821
+          password: $$2a$$12$$lrCgdIhZujaI0OJzSJIrZOPMjunbcxpdbF2xC/wUZwnyJ/bADZYli
+    - Pi-hole:
+        icon: pi-hole.png
+        href: http://192.168.1.24/admin
+        description: DNS & ad blocking
+        server: my-server
+        container: pihole
+        widget:
+          type: pihole
+          url: http://192.168.1.24
+          version: 6
+          password: admin
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: http://192.168.1.24:3001
+        description: Service uptime
+        server: my-server
+        container: uptime-kuma
+        widget:
+          type: uptimekuma
+          url: http://192.168.1.24:3001
+          slug: docker
+
+- Storage:
+    - Samba:
+        icon: samba.png
+        href: smb://192.168.1.24
+        description: Media file share
+        server: my-server
+        container: samba
+        ping: 192.168.1.24

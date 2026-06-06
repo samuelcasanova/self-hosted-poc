@@ -1,0 +1,4 @@
+[2026-06-06T18:44:32.991Z] error: <piholeProxyHandler> Error calling Pi-Hole API: 401. Data: {"error":{"key":"unauthorized","message":"Unauthorized","hint":null},"took":3.0279159545898438e-05}
+[2026-06-06T18:44:33.194Z] error: <credentialedProxyHandler> HTTP Error 500 calling http://192.168.1.24:51821/api/wireguard/client
+[2026-06-06T18:48:42.908Z] error: <piholeProxyHandler> Error calling Pi-Hole API: 401. Data: {"error":{"key":"unauthorized","message":"Unauthorized","hint":null},"took":3.8623809814453125e-05}
+[2026-06-06T18:48:43.264Z] error: <credentialedProxyHandler> HTTP Error 500 calling http://192.168.1.24:51821/api/wireguard/client
