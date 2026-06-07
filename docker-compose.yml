@@ -175,6 +175,28 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
 
+  restic-backup:
+    image: restic/restic:latest
+    container_name: restic-backup
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/scripts/entrypoint.sh"]
+    environment:
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+      B2_ACCOUNT_ID: ${B2_ACCOUNT_ID}
+      B2_ACCOUNT_KEY: ${B2_ACCOUNT_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      BACKUP_CRON: ${BACKUP_CRON:-0 2 * * *}
+    volumes:
+      - ./config:/data/config:ro
+      - ./media:/data/media:ro
+      - ./scripts:/scripts:ro
+      - restic-cache:/root/.cache/restic
+
+volumes:
+  restic-cache:
+
 networks:
   nextcloud-net:
   immich-net:
