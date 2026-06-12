@@ -1,0 +1,42 @@
+mqtt:
+  enabled: true
+  host: mosquitto
+  port: 1883
+
+ffmpeg:
+  hwaccel_args: []
+
+detectors:
+  cpu:
+    type: cpu
+    num_threads: 2
+
+cameras:
+  door:
+    ffmpeg:
+      inputs:
+        - path: /dev/video0
+          input_args: -f v4l2 -input_format mjpeg -framerate 10 -video_size 640x480
+          roles:
+            - detect
+
+    detect:
+      enabled: true
+      width: 640
+      height: 480
+      fps: 5
+
+    snapshots:
+      enabled: true
+      retain:
+        default: 7        # days
+
+    record:
+      enabled: false
+
+    objects:
+      track:
+        - person
+      filters:
+        person:
+          min_score: 0.6  # ignore low-confidence detections
