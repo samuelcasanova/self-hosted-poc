@@ -181,6 +181,8 @@ services:
       WG_HOST: samuelcasanova.duckdns.org
       PASSWORD_HASH: ${WIREGUARD_PASSWORD_HASH}
       WG_DEFAULT_DNS: 192.168.1.24,1.1.1.1
+      WG_POST_UP: iptables -t nat -A PREROUTING -i wg0 -p tcp --dport 443 -j DNAT --to-destination 172.19.0.10:443; iptables -t nat -A PREROUTING -i wg0 -p tcp --dport 80 -j DNAT --to-destination 172.19.0.10:80
+      WG_POST_DOWN: iptables -t nat -D PREROUTING -i wg0 -p tcp --dport 443 -j DNAT --to-destination 172.19.0.10:443; iptables -t nat -D PREROUTING -i wg0 -p tcp --dport 80 -j DNAT --to-destination 172.19.0.10:80
     volumes:
       - ./ignored/wg-easy:/etc/wireguard
     cap_add:
@@ -200,6 +202,9 @@ services:
     volumes:
       - ./ignored/npm/data:/data
       - ./ignored/npm/letsencrypt:/etc/letsencrypt
+    networks:
+      default:
+        ipv4_address: 172.19.0.10
 
   vaultwarden:
     image: vaultwarden/server:latest
@@ -289,6 +294,10 @@ volumes:
   frigate-notifier-modules:
 
 networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
   nextcloud-net:
   immich-net:
   frigate-net:
